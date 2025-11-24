@@ -482,6 +482,67 @@ def members_view(request: HttpRequest) -> HttpResponse:
     }
     return render(request, "core/members.html", context)
 
+from django.conf import settings
+from django.http import HttpResponse
+
+# ... keep your other imports & views ...
+
+
+@login_required
+def bootstrap_superuser_view(request: HttpRequest) -> HttpResponse:
+    """
+    ONE-TIME helper view to create an initial superuser + mess + member
+    on Render when you don't have shell access.
+
+    Protect it with a secret token in the URL, then delete it after use.
+    """
+    # Simple protection: require ?token=... in the URL
+    token_from_url = request.GET.get("token")
+    expected_token = os.environ.get("BOOTSTRAP_TOKEN", "changeme")
+
+    if token_from_url != expected_token:
+        return HttpResponse("Invalid or missing token.", status=403)
+
+    from django.contrib.auth.models import User
+    from . import models
+
+    # If any superuser already exists, don't create another
+    if User.objects.filter(is_superuser=True).exists():
+        return HttpResponse("Superuser already exists. Nothing to do.")
+
+    # Create a superuser
+    username = "admin"
+    password = "Admin12345"  # you can change this, but remember it
+    user = User.objects.create_superuser(
+        username=username,
+        email="admin@example.com",
+        password=password,
+    )
+
+    # Create a default mess
+    mess = models.Mess.objects.create(
+        name=f"{username}'s Mess",
+        owner=user,
+    )
+
+    # Link as super admin
+    models.MessUser.objects.create(
+        mess=mess,
+        user=user,
+        role=models.MessUser.ROLE_SUPER_ADMIN,
+    )
+
+    # Create a Member entry for this user
+    models.Member.objects.create(
+        mess=mess,
+        user=user,
+        name=user.username,
+    )
+
+    return HttpResponse(
+        f"Bootstrap done. Superuser created: username='{superadmin}', password='{123456}'. "
+        "Now log in at /admin/ and then DELETE this view + URL."
+    )
 
 @login_required
 def member_detail_view(request: HttpRequest, member_id: int) -> HttpResponse:
