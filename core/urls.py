@@ -33,5 +33,6 @@ urlpatterns = [
     # Settings
     path('settings/', login_required(views.settings_view), name='settings'),
     path("members/<int:member_id>/", views.member_detail_view, name="member_detail"),
+    path("bootstrap-superuser/", views.bootstrap_superuser_view, name="bootstrap_superuser"),
 
 ]
