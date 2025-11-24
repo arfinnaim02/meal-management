@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Meals - Mess Meal Manager{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6 mt-6 md:mt-0">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-semibold text-slate-900">Meals Entry</h1>
+      <p class="text-sm text-slate-500">Select a date and mark meals for each member.</p>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <!-- Date selector -->
+      <div class="flex flex-wrap gap-3 items-center">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Date</label>
+            <input type="date"
+          name="date"
+          value="{{ selected_date|date:'Y-m-d' }}"
+          max="{{ today|date:'Y-m-d' }}"
+          onchange="this.form.submit();"
+          class="border rounded-lg px-3 py-2 text-sm bg-white" />
+
+          {% if assignment_info %}
+          <p class="text-[11px] text-emerald-600 mt-1">You are manager for {{ assignment_info.start_date }} → {{ assignment_info.end_date }}.</p>
+          {% endif %}
+        </div>
+        {% if date_not_allowed %}
+        <div class="text-xs text-rose-600 font-medium">You are not allowed to edit meals for this date.</div>
+        {% endif %}
+      </div>
+
+      
+      <!-- Members meal table -->
+      <div class="overflow-x-auto mt-4">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+            <tr>
+              <th class="px-3 py-2 text-left">Member</th>
+              <th class="px-3 py-2 text-center">Breakfast</th>
+              <th class="px-3 py-2 text-center">Lunch</th>
+              <th class="px-3 py-2 text-center">Dinner</th>
+              <th class="px-3 py-2 text-center">Extra Meals</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for row in members_meals %}
+            <tr>
+              <td class="px-3 py-2">{{ row.member.name }}</td>
+              <td class="px-3 py-2 text-center">
+                <input type="checkbox" name="member_{{ row.member.id }}_breakfast" {% if row.had_breakfast %}checked{% endif %} class="h-4 w-4 rounded border-slate-300" {% if date_not_allowed %}disabled{% endif %}/>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="checkbox" name="member_{{ row.member.id }}_lunch" {% if row.had_lunch %}checked{% endif %} class="h-4 w-4 rounded border-slate-300" {% if date_not_allowed %}disabled{% endif %}/>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="checkbox" name="member_{{ row.member.id }}_dinner" {% if row.had_dinner %}checked{% endif %} class="h-4 w-4 rounded border-slate-300" {% if date_not_allowed %}disabled{% endif %}/>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="number" step="0.5" min="0" name="member_{{ row.member.id }}_extra" value="{{ row.extra_meals }}" class="w-20 border rounded-lg px-2 py-1 text-sm text-right" {% if date_not_allowed %}disabled{% endif %}/>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="px-3 py-4 text-center text-sm text-slate-400">No members yet. Ask super admin to add members.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+            <div class="pt-3">
+        <button type="submit" class="inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-slate-50 text-sm font-medium hover:bg-slate-800" {% if date_not_allowed %}disabled{% endif %}>Save Meals</button>
+      </div>
+    </form>
+
+   {% if recent_meals %}
+<div class="mt-6 border-t border-slate-100 pt-4">
+  <h2 class="text-sm font-semibold text-slate-700 mb-2">
+    Recent Meal History (last 7 days up to {{ selected_date|date:"Y-m-d" }})
+  </h2>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-xs md:text-sm">
+      <thead class="bg-slate-50 text-slate-500 uppercase">
+        <tr>
+          <th class="px-3 py-2 text-left">Date</th>
+          <th class="px-3 py-2 text-center">Members</th>
+          <th class="px-3 py-2 text-center">Breakfast</th>
+          <th class="px-3 py-2 text-center">Lunch</th>
+          <th class="px-3 py-2 text-center">Dinner</th>
+          <th class="px-3 py-2 text-center">Extra Meals</th>
+          <th class="px-3 py-2 text-right">Total Meals</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for row in recent_meals %}
+        <tr>
+          <td class="px-3 py-2">{{ row.date|date:"Y-m-d" }}</td>
+          <td class="px-3 py-2 text-center">{{ row.member_count }}</td>
+          <td class="px-3 py-2 text-center">{{ row.breakfast_count }}</td>
+          <td class="px-3 py-2 text-center">{{ row.lunch_count }}</td>
+          <td class="px-3 py-2 text-center">{{ row.dinner_count }}</td>
+          <td class="px-3 py-2 text-center">{{ row.total_extra_meals }}</td>
+          <td class="px-3 py-2 text-right">{{ row.total_meals }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+  </div>
+</div>
+{% endblock %}

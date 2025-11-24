@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load form_extras %}
+{% block title %}Add Member - Mess Meal Manager{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-6 md:mt-0">
+  <h1 class="text-xl font-semibold text-slate-900 mb-4">Add Member</h1>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Name</label>
+        {{ form.name|add_class:"w-full border rounded-lg px-3 py-2" }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Phone</label>
+        {{ form.phone|add_class:"w-full border rounded-lg px-3 py-2" }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Link to User (optional)</label>
+        {{ form.user|add_class:"w-full border rounded-lg px-3 py-2" }}
+      </div>
+      <div class="flex items-center space-x-2">
+        {{ form.is_active }}
+        <label class="text-xs font-medium text-slate-500">Is Active</label>
+      </div>
+      <button type="submit" class="inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-slate-50 text-sm font-medium hover:bg-slate-800">
+        Save Member
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

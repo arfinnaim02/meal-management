@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Add Deposit - Mess Meal Manager{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-6 md:mt-0">
+  <h1 class="text-xl font-semibold text-slate-900 mb-4">Add Deposit</h1>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Date</label>
+        {{ form.date }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Member</label>
+        {{ form.member }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Amount (৳)</label>
+        {{ form.amount }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Method</label>
+        {{ form.method }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-500 mb-1">Note</label>
+        {{ form.note }}
+      </div>
+      <button type="submit" class="inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-slate-50 text-sm font-medium hover:bg-slate-800">
+        Save Deposit
+      </button>
+    </form>
+  </div>
+
+  {% if recent_deposit_days %}
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mt-6">
+    <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-slate-700">Recent Daily Deposits</h2>
+      <p class="text-xs text-slate-400">Total deposits per day with depositor names</p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-xs md:text-sm">
+        <thead class="bg-slate-50 text-slate-500 uppercase">
+          <tr>
+            <th class="px-4 py-2 text-left">Date</th>
+            <th class="px-4 py-2 text-right">Total Deposit (৳)</th>
+            <th class="px-4 py-2 text-left">Depositors</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for row in recent_deposit_days %}
+          <tr>
+            <td class="px-4 py-2">{{ row.date|date:"Y-m-d" }}</td>
+            <td class="px-4 py-2 text-right">{{ row.total_amount }}</td>
+            <td class="px-4 py-2">{{ row.members_str }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

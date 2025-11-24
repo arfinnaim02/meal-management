@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}Mess Meal Manager{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CDN for rapid styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div class="min-h-screen flex flex-col md:flex-row">
+    <!-- Sidebar for desktop -->
+    <aside class="hidden md:flex md:flex-col w-64 bg-slate-900 text-slate-100">
+      <div class="px-6 py-4 flex items-center justify-between border-b border-slate-700">
+        <span class="font-semibold text-lg">Meal Management System</span>
+      </div>
+      <nav class="flex-1 px-4 py-4 space-y-1 text-sm">
+        <a href="{% url 'core:dashboard' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'dashboard' %}bg-slate-800{% endif %}">
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'core:meals_add' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'meals' %}bg-slate-800{% endif %}">
+          <span>Meals</span>
+        </a>
+        <a href="{% url 'core:expense_add' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'expenses' %}bg-slate-800{% endif %}">
+          <span>Expenses</span>
+        </a>
+        <a href="{% url 'core:deposit_add' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'deposits' %}bg-slate-800{% endif %}">
+          <span>Deposits</span>
+        </a>
+        {% if user_is_super_admin %}
+        <div class="mt-4 pt-4 border-t border-slate-700 text-xs uppercase tracking-wide text-slate-400">
+          Admin
+        </div>
+        <a href="{% url 'core:manager_assignments' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'managers' %}bg-slate-800{% endif %}">
+          <span>Meal Managers</span>
+        </a>
+        <a href="{% url 'core:members' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'members' %}bg-slate-800{% endif %}">
+          <span>Members</span>
+        </a>
+        <a href="{% url 'core:settings' %}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 {% if active_nav == 'settings' %}bg-slate-800{% endif %}">
+          <span>Settings</span>
+        </a>
+        {% endif %}
+      </nav>
+      <div class="px-4 py-4 border-t border-slate-700 text-xs">
+        <div class="flex items-center justify-between">
+          {% if request.user.is_authenticated %}
+          <span class="truncate">Logged in as<br><strong>{{ request.user.username }}</strong></span>
+          <a href="{% url 'logout' %}" class="text-red-300 hover:text-red-200 text-xs font-medium">Logout</a>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
+    <!-- Mobile top nav -->
+    <div class="md:hidden fixed top-0 left-0 right-0 z-20 bg-slate-900 text-slate-100 flex items-center justify-between px-4 py-3">
+      <span class="font-semibold">MealSaaS</span>
+      <div class="flex items-center space-x-3 text-xs">
+        {% if request.user.is_authenticated %}
+        <span>{{ request.user.username }}</span>
+        <a href="{% url 'logout' %}" class="text-red-300">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+    <!-- Main content -->
+    <main class="flex-1 pt-16 md:pt-0 md:ml-64 px-4 md:px-8 py-6 md:py-8">
+      {% for message in messages %}
+        <div class="mb-4 p-3 rounded-lg text-sm {% if message.tags == 'success' %}bg-emerald-100 text-emerald-800{% elif message.tags == 'error' %}bg-rose-100 text-rose-800{% else %}bg-slate-100 text-slate-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+      {% block content %}{% endblock %}
+<footer class="w-full text-center py-4 text-xs text-slate-500 mt-8">
+  All rights reserved © <a href="https://zenithview.vercel.app/" target="_blank" class="text-blue-600 hover:underline">
+    Zenithview
+  </a>
+</footer>
+
+    </main>
+  </div>
+</body>
+</html>
